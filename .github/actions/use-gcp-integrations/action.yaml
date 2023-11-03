@@ -1,0 +1,107 @@
+name: 'Use GCP integrations'
+description: 'Connect to GCP to either use terraform or to build and deploy the application'
+
+inputs:
+  GCP_WORKLOAD_IDENTITY_PROVIDER:
+    required: true
+    type: string
+  GCP_SERVICE_ACCOUNT:
+    required: true
+    type: string
+
+  ENVIRONMENT:
+    required: false
+    type: string
+  SHOULD_APPLY_INFRA:
+    required: true
+    type: boolean
+
+  DEPLOY_APPLICATION:
+    required: false
+    type: boolean
+  BUCKET_TO_DEPLOY:
+    required: false
+    type: string
+  BUCKET_TO_DEPLOY_INDEX:
+    required: false
+    type: string
+  BUILD_PARAMS:
+    required: false
+    type: string
+    default: ''
+
+outputs:
+  plan-details:
+    description: 'Terraform Plan'
+    value: ${{ steps.store-output.outputs.plan-details }}
+
+runs:
+  using: 'composite'
+
+  steps:
+    - name: Authenticate to Google Cloud
+      uses: 'google-github-actions/auth@v1'
+      with:
+        workload_identity_provider: ${{ inputs.GCP_WORKLOAD_IDENTITY_PROVIDER}}
+        service_account: ${{ inputs.GCP_SERVICE_ACCOUNT }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Format
+      run: terraform fmt -check
+      shell: bash
+      working-directory: './infrastructure'
+
+    - name: Terraform Init
+      run: terraform init -backend-config=config/${{inputs.ENVIRONMENT}}.config -reconfigure
+      shell: bash
+      working-directory: './infrastructure'
+
+    - name: Terraform Validate
+      run: terraform validate -no-color
+      shell: bash
+      working-directory: './infrastructure'
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -no-color -input=false -var-file="${{inputs.ENVIRONMENT}}.tfvars" -lock=false
+      shell: bash
+      working-directory: './infrastructure'
+
+    - name: Store output
+      id: store-output
+      run: |
+        echo "plan-details<<EOF" >> $GITHUB_OUTPUT
+        echo "${{ steps.plan.outputs.stdout }}" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Terraform Apply
+      if: ${{ inputs.SHOULD_APPLY_INFRA == 'true' }}
+      run: terraform apply -auto-approve -input=false -var-file="${{inputs.ENVIRONMENT}}.tfvars"
+      shell: bash
+      working-directory: './infrastructure'
+
+    - name: Install dependencies
+      if: ${{ inputs.DEPLOY_APPLICATION == 'true' }}
+      uses: ./.github/actions/setup-node
+
+    - name: Build App
+      if: ${{ inputs.DEPLOY_APPLICATION == 'true' }}
+      run: ${{ inputs.BUILD_PARAMS }} yarn build:${{inputs.ENVIRONMENT}}
+      shell: bash
+
+    - name: 'Set up Cloud SDK'
+      if: ${{ inputs.DEPLOY_APPLICATION == 'true' }}
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: 'Deploy Files'
+      if: ${{ inputs.DEPLOY_APPLICATION == 'true' }}
+      run: 'gsutil -m rsync -d -c -r build/ gs://${{ inputs.BUCKET_TO_DEPLOY }}'
+      shell: bash
+
+    - name: 'Deploy Ephemeral Index'
+      if: ${{ inputs.DEPLOY_APPLICATION == 'true' && inputs.BUCKET_TO_DEPLOY_INDEX }}
+      run: 'gsutil cp login-redirect-ephemeral.html gs://${{ inputs.BUCKET_TO_DEPLOY_INDEX }}/index.html'
+      shell: bash

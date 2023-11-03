@@ -1,0 +1,146 @@
+name: 'Apply infrastructure changes and deploy (New Infra)'
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  check-prod:
+    name: 'Check Prod Infrastructure and deploy on merge'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    outputs:
+      plan-details: ${{ steps.prod-integrity.outputs.plan-details }}
+
+    steps:
+      - name: Checkout Branch Code
+        uses: actions/checkout@v3
+
+      - name: 'Check Prod Integrity and Deploy'
+        id: prod-integrity
+        uses: ./.github/actions/use-gcp-integrations
+        with:
+          GCP_WORKLOAD_IDENTITY_PROVIDER: projects/287452642188/locations/global/workloadIdentityPools/infra-pool/providers/github-training-client
+          GCP_SERVICE_ACCOUNT: training-client-cicd@c1-fellow-prod.iam.gserviceaccount.com
+          ENVIRONMENT: prod
+          SHOULD_APPLY_INFRA: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          BUCKET_TO_DEPLOY: training-client-prod
+
+  check-stage:
+    name: 'Check Stage Infrastructure and deploy on merge'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    outputs:
+      plan-details: ${{ steps.stage-integrity.outputs.plan-details }}
+
+    steps:
+      - name: Checkout Branch Code
+        uses: actions/checkout@v3
+
+      - name: 'Check Stage Integrity and Deploy'
+        id: stage-integrity
+        uses: ./.github/actions/use-gcp-integrations
+        with:
+          GCP_WORKLOAD_IDENTITY_PROVIDER: projects/419528211005/locations/global/workloadIdentityPools/my-pool/providers/github-training-client
+          GCP_SERVICE_ACCOUNT: training-client-cicd@c1-fellow-non-prod.iam.gserviceaccount.com
+          ENVIRONMENT: stage
+          SHOULD_APPLY_INFRA: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          DEPLOY_APPLICATION: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          BUCKET_TO_DEPLOY: training-client-stage
+
+  check-ephemeral:
+    name: 'Check Ephemeral Infrastructure and deploy on new commit'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    outputs:
+      plan-details: ${{ steps.ephemeral-integrity.outputs.plan-details }}
+
+    steps:
+      - name: Checkout Branch Code
+        uses: actions/checkout@v3
+
+      - name: 'Check Ephemeral Integrity and Deploy'
+        id: ephemeral-integrity
+        uses: ./.github/actions/use-gcp-integrations
+        with:
+          GCP_WORKLOAD_IDENTITY_PROVIDER: projects/419528211005/locations/global/workloadIdentityPools/my-pool/providers/github-training-client
+          GCP_SERVICE_ACCOUNT: training-client-cicd@c1-fellow-non-prod.iam.gserviceaccount.com
+          ENVIRONMENT: ephemeral
+          SHOULD_APPLY_INFRA: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+          DEPLOY_APPLICATION: ${{ github.ref != 'refs/heads/main' || github.event_name != 'push'}}
+          BUCKET_TO_DEPLOY: training-client-ephemeral/ephemeral-${{ github.event.pull_request.number }}/
+          BUILD_PARAMS: PUBLIC_URL=/ephemeral-${{ github.event.pull_request.number }}/
+          BUCKET_TO_DEPLOY_INDEX: training-client-ephemeral
+
+  output-terraform-plans:
+    if: ${{ github.ref != 'refs/heads/main' || github.event_name != 'push'}}
+    needs: [check-prod, check-stage, check-ephemeral]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Branch Code
+        uses: actions/checkout@v3
+
+      - name: 'Update Success Output'
+        uses: ./.github/actions/find-and-edit-comment
+        with:
+          COMMENT_TITLE: Infrastructure Plans
+          COMMENT_CONTENT: |
+            <details>
+              <summary>Production Plan</summary>
+
+              ```
+              ${{needs.check-prod.outputs.plan-details}}
+              ```
+              
+            </details>
+            <details>
+              <summary>Stage Plan</summary>
+
+              ```
+              ${{needs.check-stage.outputs.plan-details}}
+
+              ```
+
+            </details>
+            <details>
+              <summary>Ephemeral Plan</summary>
+
+              ```
+              ${{needs.check-ephemeral.outputs.plan-details}}
+
+              ```
+
+            </details>
+
+
+
+  output-ephemeral-env-url:
+    if: ${{ github.ref != 'refs/heads/main' || github.event_name != 'push'}}
+    needs: [check-ephemeral]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Branch Code
+        uses: actions/checkout@v3
+
+      - name: 'Update Success Output'
+        uses: ./.github/actions/find-and-edit-comment
+        with:
+          COMMENT_TITLE: PR Based Environment
+          COMMENT_CONTENT: |
+            :heavy_check_mark::heavy_check_mark: All Set! :heavy_check_mark::heavy_check_mark: 
+            The app can be tested in: https://ephemeral.training.internal.correlation-one.com/ephemeral-${{ github.event.pull_request.number }}/

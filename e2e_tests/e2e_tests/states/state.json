@@ -1,0 +1,121 @@
+{
+  "cookies": [
+    {
+      "name": "_csrf",
+      "value": "3H4-TJWCFTLFU4gjUui5ncwq",
+      "domain": "login.correlation-one.com",
+      "path": "/usernamepassword/login",
+      "expires": 1680208334.223708,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga",
+      "value": "GA1.1.887579623.1679344333",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1713904337.133896,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "did",
+      "value": "s%3Av0%3A4c3999d0-c75e-11ed-ac2d-95d5500c6542.WraCyqPcxIUomWDZwKigLV7cv7mBpfm24JMJgM3bbVg",
+      "domain": "login.correlation-one.com",
+      "path": "/",
+      "expires": 1710901933.9164,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "did_compat",
+      "value": "s%3Av0%3A4c3999d0-c75e-11ed-ac2d-95d5500c6542.WraCyqPcxIUomWDZwKigLV7cv7mBpfm24JMJgM3bbVg",
+      "domain": "login.correlation-one.com",
+      "path": "/",
+      "expires": 1710901933.916533,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "auth0",
+      "value": "s%3Ai_wyqBFl2kO-15K_O4JKD8iCVamxq4P-.iBGop%2Fnx19NuPlTeM2%2Fx9fnE9L1NHv4hs6FjAzIyf9o",
+      "domain": "login.correlation-one.com",
+      "path": "/",
+      "expires": 1679603536.082475,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "None"
+    },
+    {
+      "name": "auth0_compat",
+      "value": "s%3Ai_wyqBFl2kO-15K_O4JKD8iCVamxq4P-.iBGop%2Fnx19NuPlTeM2%2Fx9fnE9L1NHv4hs6FjAzIyf9o",
+      "domain": "login.correlation-one.com",
+      "path": "/",
+      "expires": 1679603536.082505,
+      "httpOnly": true,
+      "secure": true,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_ga_21VGP0V97J",
+      "value": "GS1.1.1679344333.1.1.1679344337.0.0.0",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1713904337.139005,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "_legacy_auth0.C1OkvXb65DRoWm81AA2bhn8RafOEG44d.is.authenticated",
+      "value": "true",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1679430737,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "auth0.C1OkvXb65DRoWm81AA2bhn8RafOEG44d.is.authenticated",
+      "value": "true",
+      "domain": "localhost",
+      "path": "/",
+      "expires": 1679430737,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "ld:$anonUserId",
+          "value": "4bbaa5d0-c75e-11ed-a940-2b850287318b"
+        },
+        {
+          "name": "page-has-been-force-refreshed",
+          "value": "false"
+        },
+        {
+          "name": "reactQueryDevtoolsSortFn",
+          "value": "\"Status > Last Updated\""
+        },
+        {
+          "name": "ld:63c1964cbfd7a312df725557:$diagnostics",
+          "value": "{\"dataSinceDate\":1679344337259,\"droppedEvents\":0,\"eventsInLastBatch\":0,\"streamInits\":[]}"
+        },
+        {
+          "name": "access",
+          "value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InpDVFNlTV9TS1F1cnhBRDZrY1NuLSJ9.eyJpc3MiOiJodHRwczovL2xvZ2luLmNvcnJlbGF0aW9uLW9uZS5jb20vIiwic3ViIjoiYXV0aDB8NjNiZWU4NmExOWM3ZmVjODVmYjNjNDdmIiwiYXVkIjpbImh0dHBzOi8vYXBpLmNvcnJlbGF0aW9uLW9uZS5jb20vYXBpIiwiaHR0cHM6Ly9kZXYtZ21iajZ2c3EudXMuYXV0aDAuY29tL3VzZXJpbmZvIl0sImlhdCI6MTY3OTM0NDMzNywiZXhwIjoxNjc5NDMwNzM3LCJhenAiOiJDMU9rdlhiNjVEUm9XbTgxQUEyYmhuOFJhZk9FRzQ0ZCIsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwifQ.dIj9acdCJg5_E_OVmHRyZ6PQm2Y1EalfywYyHfRwTWEgzETaQce9Ln6bCEd6EZWk9GXHdQF-l5QO7KQQxiuPHafUgDjITUAymM-q5lX29sOf9No9ZiDn2oYx_zvOI7hPsvLu6X1E551pJe_JxY4SbjiwVpNcIXREhDBdNxcpuBwFFcVFtNoi_8t9fz_6ySaYyx1ApJ02Z8_YHod6wlis-QzefOUalGlsr3RAM_nibzF85psMbiKg7dKN_ij6dvXD1t7WQZOP5EQkvPssX6t-0321oSxJXaKcGFY3KyinASUXeg_T5kdwc_rL9rC0djOi2Iy0wyq01544k0XfTXxAzA"
+        }
+      ]
+    }
+  ]
+}

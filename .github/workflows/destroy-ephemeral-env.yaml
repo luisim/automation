@@ -1,0 +1,31 @@
+name: 'Destroy PR based env'
+
+on:
+  pull_request:
+    types:
+      - closed
+jobs:
+  delete-env:
+    name: 'Delete PR Based Env'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout Branch Code
+        uses: actions/checkout@v3
+
+      - id: 'auth'
+        name: 'Authenticate to Google Cloud'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/419528211005/locations/global/workloadIdentityPools/my-pool/providers/github-training-client'
+          service_account: 'training-client-cicd@c1-fellow-non-prod.iam.gserviceaccount.com'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - name: Remove ephemeral environment data from bucket
+        run: gsutil rm -r gs://training-client-ephemeral/ephemeral-${{ github.event.pull_request.number }}/

@@ -1,0 +1,28 @@
+name: Send coverage report to Deepsource
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: "read"
+  id-token: "write"
+
+jobs:
+  send_coverage_report:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: ./.github/actions/setup-node
+
+      - name: "Test and Report"
+        uses: ./.github/actions/test-and-report
+        with:
+          DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}

@@ -1,0 +1,37 @@
+<!-- 
+  Purpose of this file:
+
+  With our current infrastructure, we are redirecting the users from auth0 to our root bucket.
+  The root bucket serves this file, so then when a user hits the root URL this script will be
+  redirecting the user to the correct ephemeral environment.
+ -->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      // Get the ephemeral-n bit of the url no matter if the url has more subdirectories.
+      const EPHEMERAL_URL_REGEX = /ephemeral-(.*?)\//;
+      const LOCAL_STORAGE_KEY = "training-client-ephemeral";
+      const NON_PROD_HOSTNAME =
+        "ephemeral.training.internal.correlation-one.com";
+      const urlToRedirect = localStorage.getItem(LOCAL_STORAGE_KEY);
+      const newLocation = new URL(`https://${NON_PROD_HOSTNAME}`);
+      if (
+        window.location.hostname === NON_PROD_HOSTNAME &&
+        urlToRedirect?.includes("ephemeral-")
+      ) {
+        const ephemeral = urlToRedirect?.match(/ephemeral-(.*?)\//)?.[0] || "";
+        newLocation.pathname = `/${ephemeral}`;
+        newLocation.search = window.location.search;
+        window.location.replace(newLocation.toString());
+      } else if (
+        window.location.hostname === NON_PROD_HOSTNAME &&
+        !urlToRedirect
+      ) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, window.location.href);
+        window.location.replace(newLocation);
+      }
+    </script>
+  </head>
+</html>

@@ -1,0 +1,25 @@
+name: Test and report
+description: Test code and send coverage to deep source
+
+inputs:
+  DEEPSOURCE_DSN:
+    description: "DeepSource DNS"
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Install DeepSource cli
+      run: curl https://deepsource.io/cli | sh
+      shell: bash
+
+    - name: Run tests
+      run: yarn coverage --coverageReporters=cobertura
+      shell: bash
+
+    - name: Upload Report To DeepSource
+      run: ./bin/deepsource report --analyzer test-coverage --key javascript --value-file coverage/cobertura-coverage.xml
+      shell: bash
+      env:
+        DEEPSOURCE_DSN: ${{ inputs.DEEPSOURCE_DSN }}

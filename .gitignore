@@ -1,0 +1,30 @@
+# Personal use artifact
+.DS_Store
+.vscode
+.ignore
+
+# Javascript
+node_modules
+
+# Testing
+coverage
+
+# Distribution / packaging
+build/
+
+# Format and lint
+.prettierrc.js
+.eslintcache
+
+# Terraform
+**/.terraform/*
+
+*.tfstate
+*.tfstate.*
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
